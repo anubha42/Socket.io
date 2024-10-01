@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>Socket.IO Chat</title>
+        <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    </head>
+    <body>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.6.1/socket.io.js"></script>
+        <h1>Socket.IO Chat</h1>
+
+        <div class="messages"></div>
+        <input placeholder="Message" id="messageInput" />
+
+        <script>
+            // Initialize Socket.IO connection
+            const sio = io();
+
+            // Select the message container
+            let messageContainer = document.querySelector(".messages");
+
+            // When the client connects
+            sio.on("connect", () => {
+                let p = document.createElement("p");
+                p.innerText = "You're connected!";
+                messageContainer.appendChild(p);
+            });
+
+            // Listen for the 'display_message' event
+            sio.on('display_message', (message) => {
+                console.log('Received message: ' + message);
+                let messageElement = document.createElement("p");
+                messageElement.innerText = message;
+                messageContainer.appendChild(messageElement);
+            });
+
+            // Capture input and emit 'message' event on pressing Enter
+            let messageInput = document.getElementById("messageInput");
+            messageInput.addEventListener("keypress", (e) => {
+                if (e.key === "Enter" && messageInput.value.trim() !== "") {
+                    console.log('Sending message: ' + messageInput.value);
+                    sio.emit("message", messageInput.value);  // Emit the message
+                    messageInput.value = "";  // Clear the input field
+                }
+            });
+        </script>
+
+        <h1>End of Chat</h1>
+    </body>
+</html>
+
